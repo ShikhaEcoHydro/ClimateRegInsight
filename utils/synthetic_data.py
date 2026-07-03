@@ -45,6 +45,23 @@ REGION_PHYSICAL_RISK = {
     "Punjab": 3,             # groundwater depletion
     "West Bengal": 4,        # delta/flood exposure
 }
+
+# Approximate state/region centroid coordinates (lat, lon), for mapping.
+REGION_COORDINATES = {
+    "Uttar Pradesh": (26.8467, 80.9462),
+    "Bihar": (25.0961, 85.3131),
+    "Assam": (26.2006, 92.9376),
+    "Kerala": (10.8505, 76.2711),
+    "Rajasthan": (27.0238, 74.2179),
+    "Maharashtra": (19.7515, 75.7139),
+    "Gujarat": (22.2587, 71.1924),
+    "Tamil Nadu": (11.1271, 78.6569),
+    "Karnataka": (15.3173, 75.7139),
+    "Delhi NCR": (28.7041, 77.1025),
+    "Punjab": (31.1471, 75.3412),
+    "West Bengal": (22.9868, 87.8550),
+}
+
 if __name__ == "__main__":
     print("--- Transition Risk by Sector ---")
     for sector, risk in SECTOR_TRANSITION_RISK.items():
@@ -58,6 +75,7 @@ def generate_borrower():
     """Generate a single synthetic borrower with sector, region, and loan details."""
     sector = random.choice(list(SECTOR_TRANSITION_RISK.keys()))
     region = random.choice(list(REGION_PHYSICAL_RISK.keys()))
+    lat, lon = REGION_COORDINATES[region]
 
     borrower = {
         "borrower_name": fake.company(),
@@ -66,6 +84,8 @@ def generate_borrower():
         "loan_value_inr": round(random.uniform(5_00_000, 5_00_00_000), 2),
         "transition_risk": SECTOR_TRANSITION_RISK[sector],
         "physical_risk": REGION_PHYSICAL_RISK[region],
+        "lat": lat,
+        "lon": lon,
     }
     return borrower
 
