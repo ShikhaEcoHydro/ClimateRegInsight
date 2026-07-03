@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import folium
+from streamlit_folium import st_folium
 
 st.title("ClimateReg Insight")
 st.write("Climate-related financial risk scoring for loan portfolios")
@@ -66,3 +68,27 @@ with col_b:
         title="Borrower Count by Sector",
     )
     st.plotly_chart(fig_pie, use_container_width=True)
+
+st.subheader("Geographic Exposure")
+
+# Aggregate by region so we get one marker per state, not 200 overlapping ones
+region_summary = filtered_df.groupby(["region", "lat", "lon"]).agg(
+    total_exposure=("loan_value_inr", "sum"),
+    borrower_count=("borrower_name", "count"),
+).reset_index()
+
+m = folium.Map(location=[22.5, 80], zoom_start=5, tiles="CartoDB positron")
+
+for _, row in region_summary.iterrows():
+    folium.CircleMarker(
+        location=[row["lat"], row["lon"]],
+        radius=max(5, row["total_exposure"] / 5e7),  # scale circle size by exposure
+        popup=f"{row['region']}<br>Exposure: ₹{row['total_exposure']/1e7:.1f} Cr<br>Borrowers: {row['borrower_count']}",
+        tooltip=row["region"],
+        color="#2E7D5B",
+        fill=True,
+        fill_color="#2E7D5B",
+        fill_opacity=0.6,
+    ).add_to(m)
+
+st_folium(m, use_container_width=True, height=500)
