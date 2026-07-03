@@ -7,5 +7,6 @@ outputs/*
 !outputs/.gitkeep
 data/*.csv
 !data/.gitkeep
+!data/sample_sustainability_report.pdf
 .vscode/
 .idea/
