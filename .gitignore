@@ -3,7 +3,6 @@ __pycache__/
 *.egg-info/
 venv/
 .venv/
-.streamlit/
 outputs/*
 !outputs/.gitkeep
 data/*.csv
