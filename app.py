@@ -3,6 +3,9 @@ import pandas as pd
 import plotly.express as px
 import folium
 from streamlit_folium import st_folium
+import sys
+sys.path.append("src")
+from disclosure import extract_text_from_pdf, score_disclosure
 
 st.title("ClimateReg Insight")
 st.write("Climate-related financial risk scoring for loan portfolios")
@@ -104,3 +107,22 @@ for _, row in region_summary.iterrows():
     ).add_to(m)
 
 st_folium(m, use_container_width=True, height=500)
+
+st.subheader("Disclosure Analyzer")
+st.caption("Upload a sustainability/ESG report (PDF) to score it against RBI's four disclosure pillars.")
+
+uploaded_pdf = st.file_uploader("Upload sustainability report", type="pdf")
+
+if uploaded_pdf is not None:
+    text = extract_text_from_pdf(uploaded_pdf)
+    results, overall = score_disclosure(text)
+
+    st.metric("Overall Disclosure Score", f"{overall}%")
+
+    pillar_cols = st.columns(4)
+    for col, (pillar, data) in zip(pillar_cols, results.items()):
+        col.metric(pillar, f"{data['score']}%")
+
+    with st.expander("See keyword matches by pillar"):
+        for pillar, data in results.items():
+            st.write(f"**{pillar}**: {', '.join(data['keywords_found']) if data['keywords_found'] else 'None found'}")
