@@ -75,20 +75,32 @@ st.subheader("Geographic Exposure")
 region_summary = filtered_df.groupby(["region", "lat", "lon"]).agg(
     total_exposure=("loan_value_inr", "sum"),
     borrower_count=("borrower_name", "count"),
+    avg_composite_score=("composite_score", "mean"),
 ).reset_index()
+
+def score_to_color(score):
+    if score >= 4.0:
+        return "#E53935"  # High - red
+    elif score >= 2.5:
+        return "#FFA726"  # Medium - orange
+    else:
+        return "#4CAF50"  # Low - green
 
 m = folium.Map(location=[22.5, 80], zoom_start=5, tiles="CartoDB positron")
 
 for _, row in region_summary.iterrows():
+    color = score_to_color(row["avg_composite_score"])
     folium.CircleMarker(
         location=[row["lat"], row["lon"]],
-        radius=max(5, row["total_exposure"] / 5e7),  # scale circle size by exposure
-        popup=f"{row['region']}<br>Exposure: ₹{row['total_exposure']/1e7:.1f} Cr<br>Borrowers: {row['borrower_count']}",
+        radius=max(5, row["total_exposure"] / 5e7),
+        popup=f"{row['region']}<br>Exposure: ₹{row['total_exposure']/1e7:.1f} Cr<br>"
+              f"Borrowers: {row['borrower_count']}<br>"
+              f"Avg Risk Score: {row['avg_composite_score']:.2f}",
         tooltip=row["region"],
-        color="#2E7D5B",
+        color=color,
         fill=True,
-        fill_color="#2E7D5B",
-        fill_opacity=0.6,
+        fill_color=color,
+        fill_opacity=0.7,
     ).add_to(m)
 
 st_folium(m, use_container_width=True, height=500)
