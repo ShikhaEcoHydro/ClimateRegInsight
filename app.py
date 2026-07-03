@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 st.title("ClimateReg Insight")
 st.write("Climate-related financial risk scoring for loan portfolios")
+st.caption("⚠️ Built on synthetic data for demonstration purposes. Methodology inspired by RBI's Draft Disclosure Framework on Climate-related Financial Risks, 2024.")
 
 df = pd.read_csv("data/scored_portfolio.csv")
 
@@ -34,4 +36,33 @@ col2.metric("High-Risk Exposure", f"₹{high_risk_exposure/1e7:.1f} Cr")
 col3.metric("High-Risk % of Portfolio", f"{high_risk_pct:.1f}%")
 
 st.subheader(f"Portfolio Overview ({len(filtered_df)} borrowers)")
-st.dataframe(filtered_df)
+st.dataframe(filtered_df, hide_index=True)
+
+st.subheader("Risk Distribution")
+
+col_a, col_b = st.columns(2)
+
+with col_a:
+    exposure_by_band = filtered_df.groupby("risk_band")["loan_value_inr"].sum().reset_index()
+    fig_bar = px.bar(
+        exposure_by_band,
+        x="risk_band",
+        y="loan_value_inr",
+        color="risk_band",
+        color_discrete_map={"Low": "#4CAF50", "Medium": "#FFA726", "High": "#E53935"},
+        category_orders={"risk_band": ["Low", "Medium", "High"]},
+        title="Exposure (₹) by Risk Band",
+        labels={"loan_value_inr": "Loan Exposure (₹)", "risk_band": "Risk Band"},
+    )
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+with col_b:
+    count_by_sector = filtered_df["sector"].value_counts().reset_index()
+    count_by_sector.columns = ["sector", "count"]
+    fig_pie = px.pie(
+        count_by_sector,
+        names="sector",
+        values="count",
+        title="Borrower Count by Sector",
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
