@@ -8,7 +8,7 @@ import pandas as pd
 import random
 from faker import Faker
 
-fake = Faker()
+fake = Faker("en_IN")
 
 # Transition risk: how exposed is this sector to carbon pricing,
 # regulatory tightening, and the shift to a low-carbon economy?

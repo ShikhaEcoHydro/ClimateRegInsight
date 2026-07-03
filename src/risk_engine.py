@@ -54,8 +54,26 @@ def score_portfolio(csv_path="data/synthetic_loan_portfolio.csv"):
     df["risk_band"] = df["composite_score"].apply(get_risk_band)
 
     return df
+
+def summarize_exposure(scored_df):
+    """
+    Summarize loan exposure (total ₹ value and % of portfolio) by risk band.
+    """
+    summary = scored_df.groupby("risk_band").agg(
+        borrower_count=("borrower_name", "count"),
+        total_exposure_inr=("loan_value_inr", "sum"),
+    )
+    summary["pct_of_portfolio"] = (
+        summary["total_exposure_inr"] / summary["total_exposure_inr"].sum() * 100
+    ).round(1)
+    return summary.sort_values("total_exposure_inr", ascending=False)
     
 if __name__ == "__main__":
     scored = score_portfolio()
     print(scored[["borrower_name", "sector", "region", "composite_score", "risk_band"]].head(10))
-    print(f"\nRisk band distribution:\n{scored['risk_band'].value_counts()}")
+
+    exposure = summarize_exposure(scored)
+    print(f"\nExposure by risk band:\n{exposure}")
+
+    scored.to_csv("data/scored_portfolio.csv", index=False)
+    print("\nSaved scored portfolio to data/scored_portfolio.csv")
