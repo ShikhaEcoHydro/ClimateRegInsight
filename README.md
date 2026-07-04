@@ -38,13 +38,13 @@ ClimateRegInsight/
 
 ## Roadmap
 
-- [ ] Module 1 — Project setup & repo
-- [ ] Module 2 — Climate risk scoring engine
-- [ ] Module 3 — Streamlit dashboard
-- [ ] Module 4 — Geospatial exposure map
-- [ ] Module 5 — Disclosure analyzer
-- [ ] Module 6 — Supervisory report generator
-- [ ] Module 7 — Polish & deploy
+- [x] Module 1 — Project setup & repo
+- [x] Module 2 — Climate risk scoring engine
+- [x] Module 3 — Streamlit dashboard
+- [x] Module 4 — Geospatial exposure map
+- [x] Module 5 — Disclosure analyzer
+- [x] Module 6 — Supervisory report generator
+- [x] Module 7 — Polish & deploy
 
 ## Setup
 
@@ -57,4 +57,6 @@ streamlit run app.py
 
 ## Author
 
-Deepshikha Srivastava — Applied Ecohydrology (Erasmus Mundus), Applied Geology.
+Deepshikha Srivastava — Applied Ecohydrology (Erasmus Mundus), Applied Geology (Central University of Karnataka).
+
+🔗 **Live app:** [climatereginsight.streamlit.app](https://climatereginsight.streamlit.app)
