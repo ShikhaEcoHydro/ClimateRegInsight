@@ -60,3 +60,6 @@ streamlit run app.py
 Deepshikha Srivastava — Applied Ecohydrology (Erasmus Mundus), Applied Geology (Central University of Karnataka).
 
 🔗 **Live app:** [climatereginsight.streamlit.app](https://climatereginsight.streamlit.app)
+
+See [docs/methodology.md](docs/methodology.md) for the full methodology,
+including known limitations and what would change with real data.
