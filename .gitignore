@@ -8,5 +8,6 @@ outputs/*
 data/*.csv
 !data/.gitkeep
 !data/sample_sustainability_report.pdf
+!data/scored_portfolio.csv
 .vscode/
 .idea/
