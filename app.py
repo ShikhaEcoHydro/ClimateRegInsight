@@ -6,6 +6,7 @@ from streamlit_folium import st_folium
 import sys
 sys.path.append("src")
 from disclosure import extract_text_from_pdf, score_disclosure
+from report import generate_report
 
 st.title("ClimateReg Insight")
 st.write("Climate-related financial risk scoring for loan portfolios")
@@ -59,7 +60,7 @@ with col_a:
         title="Exposure (₹) by Risk Band",
         labels={"loan_value_inr": "Loan Exposure (₹)", "risk_band": "Risk Band"},
     )
-    st.plotly_chart(fig_bar, use_container_width=True)
+    st.plotly_chart(fig_bar, width='stretch')
 
 with col_b:
     count_by_sector = filtered_df["sector"].value_counts().reset_index()
@@ -70,7 +71,7 @@ with col_b:
         values="count",
         title="Borrower Count by Sector",
     )
-    st.plotly_chart(fig_pie, use_container_width=True)
+    st.plotly_chart(fig_pie, width='stretch')
 
 st.subheader("Geographic Exposure")
 
@@ -106,7 +107,7 @@ for _, row in region_summary.iterrows():
         fill_opacity=0.7,
     ).add_to(m)
 
-st_folium(m, use_container_width=True, height=500)
+st_folium(m, width='stretch', height=500)
 
 st.subheader("Disclosure Analyzer")
 st.caption("Upload a sustainability/ESG report (PDF) to score it against RBI's four disclosure pillars.")
@@ -126,3 +127,39 @@ if uploaded_pdf is not None:
     with st.expander("See keyword matches by pillar"):
         for pillar, data in results.items():
             st.write(f"**{pillar}**: {', '.join(data['keywords_found']) if data['keywords_found'] else 'None found'}")
+
+st.subheader("Generate Report")
+
+exposure_summary_table = filtered_df.groupby("risk_band").agg(
+    borrower_count=("borrower_name", "count"),
+    total_exposure_inr=("loan_value_inr", "sum"),
+)
+exposure_summary_table["pct_of_portfolio"] = (
+    exposure_summary_table["total_exposure_inr"] / exposure_summary_table["total_exposure_inr"].sum() * 100
+)
+
+if st.button("Generate PDF Report"):
+    disclosure_results = results if uploaded_pdf is not None else None
+    overall_disclosure_score = overall if uploaded_pdf is not None else None
+
+    pdf_buffer = generate_report(
+        exposure_summary_table,
+        total_exposure,
+        high_risk_pct,
+        disclosure_results,
+        overall_disclosure_score,
+    )
+
+    st.download_button(
+        "Download Report (PDF)",
+        data=pdf_buffer,
+        file_name="climatereg_insight_report.pdf",
+        mime="application/pdf",
+    )
+
+st.divider()
+st.caption(
+    "Built by Deepshikha Srivastava | Portfolio project demonstrating climate risk "
+    "scoring and disclosure assessment for financial institutions | "
+    "[GitHub](https://github.com/ShikhaEcoHydro/ClimateRegInsight)"
+)
